@@ -20,22 +20,6 @@ The script fetches a board's lists and cards, enriches each card with computed f
 and upserts it into a Dust Data Source using the card's Trello ID as the document ID. It also
 generates one **board digest** document per run summarizing counts across the whole board.
 
-### Why a Data Source sync, not an MCP server?
-
-Dust offers two integration paths: **Data Sources** (ingest data for retrieval/RAG) and
-**Remote MCP Servers** (expose live tool calls an agent can invoke, e.g. to create/move cards).
-This project uses a Data Source sync because:
-
-- The brief describes a one-way pipeline — "process project management data", "retrieve...
-  via the API and connect it to Dust" — not an agentic action layer.
-- The use case is read-only Q&A about board status. MCP would be the right call if the ask
-  were "let an agent create/move Trello cards," but it isn't here, and building an MCP server
-  would spend the time budget on tool-schema/auth plumbing instead of the retrieval/enrichment
-  logic actually being evaluated.
-- Dust has no native Trello connector today (Notion, Jira, Asana, Monday.com, Confluence,
-  GitHub, Google Drive, HubSpot, Airtable, etc. exist; Trello doesn't), which validates a
-  custom sync against Trello's REST API rather than duplicating existing Dust infrastructure.
-
 ## Setup
 
 1. **Trello credentials**: generate an API key and token at
@@ -59,11 +43,8 @@ This project uses a Data Source sync because:
 # Full sync of all boards listed in TRELLO_BOARD_IDS
 python main.py
 
-# Sync a single board, overriding TRELLO_BOARD_IDS
-python main.py --board <board_id>
-
 # Dry run: print generated markdown documents to stdout, skip Dust entirely
-python main.py --dry-run --board <board_id>
+python main.py --dry-run
 ```
 
 Each run prints a summary: boards processed, cards upserted, digest documents upserted, and
